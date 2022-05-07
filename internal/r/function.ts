@@ -15,7 +15,7 @@ export class ReQLFunction extends Term {
   constructor(private func: Function) {
     super();
   }
-  get query() {
+  get query(): [TermType, unknown[]] {
     const args = [];
     const argVars = [];
     for (let i = 0; i < this.func.length; i++) {
