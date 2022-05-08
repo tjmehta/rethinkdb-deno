@@ -1,8 +1,6 @@
 import { DBConfig, DBConfigResponse } from "./internal/r/db.ts";
 import { connect, r } from "./mod.ts";
 
-import { ReQLString } from "./internal/r/datum_primitives.ts";
-
 const session = await connect({
   hostname: Deno.env.get("RETHINK_HOST") ?? 'localhost',
   port: 28015,
@@ -10,17 +8,8 @@ const session = await connect({
   password: Deno.env.get("RETHINK_PASSWORD"),
 });
 
-const text = function () {
-  return 1 + 1;
-};
-
-const users = await r
-  .add(1,1)
-  // .db("test")
-  // .table("test")
-  // // .count()
-  // // .run(session);
-  // .status()
+const result = await r
+  .add(0, 0)
   .run(session);
 
-console.log(users[0]);
+console.log(result);

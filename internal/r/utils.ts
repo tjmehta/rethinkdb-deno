@@ -1,15 +1,18 @@
-import { ReQLString, ReQLDatum } from "./datum_primitives.ts";
 import { Datum, ReQLDatumTypes } from "./datum.ts";
+import { ReQLDatum, ReQLString } from "./datum_primitives.ts";
+
+import { QueryType } from '../proto.ts';
+import { ReQLFunction } from "./function.ts";
+import { Runnable } from "./runnable.ts";
+import { SingleSelection } from "./single.ts";
 import { TermType } from "../proto.ts";
 import { exprq } from "./expr.ts";
-import { ReQLFunction } from "./function.ts";
-import { SingleSelection } from "./single.ts";
-import { Runnable } from "./runnable.ts";
 
 export const utils = {
   do: _do,
   js,
   uuid,
+  server
   // TODO(lucacasonato): implement default
   // TODO(lucacasonato): implement json
   // TODO(lucacasonato): implement literal
@@ -71,5 +74,22 @@ class UUID extends ReQLString {
   get query() {
     const query: unknown[] = [TermType.UUID];
     return query.concat(this.seed ? [[exprq(this.seed)]] : []);
+  }
+}
+
+function server() {
+  return new ServerInfo();
+}
+
+class ServerInfo extends Runnable<ReQLDatumTypes> {
+  constructor() {
+    super()
+  }
+  get _start() {
+    const start: unknown[] = [QueryType.SERVER_INFO];
+    return start
+  }
+  get query() {
+    return []
   }
 }

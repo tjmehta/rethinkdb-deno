@@ -1,14 +1,18 @@
-import { Session } from "../session.ts";
-import { ReQLError } from "../errors.ts";
-import { ResponseType, ResponseNote } from "../proto.ts";
 import { ReQLBool, ReQLNumber, ReQLString } from "./datum_primitives.ts";
 import { ReQLDatumTypes, ReQLObject, ReQLObjectTypes } from "./datum.ts";
+import { ResponseNote, ResponseType } from "../proto.ts";
+
 import { ReQLArray } from "./array.ts";
+import { ReQLError } from "../errors.ts";
+import { Session } from "../session.ts";
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
 export abstract class Term {
+  public get _start(): unknown[] | undefined {
+    return undefined;
+  };
   public abstract get query(): unknown[];
 
   // TODO(lucacasonato): implement coerceTo
@@ -37,7 +41,7 @@ interface ReQLResponse {
 export abstract class Runnable<T extends ReQLDatumTypes> extends Term {
   // deno-lint-ignore no-explicit-any
   public async run<W = any>(session: Session): Promise<W[]> {
-    const start = [1, this.query, {}];
+    const start = this._start ?? [1, this.query, {}];
     const data = JSON.stringify(start);
     const buffer = encoder.encode(data);
     const respBuffer = await session.dispatch(buffer);
@@ -68,7 +72,8 @@ export abstract class Runnable<T extends ReQLDatumTypes> extends Term {
       }
       if (
         (type === ResponseType.SUCCESS_ATOM ||
-          type === ResponseType.SUCCESS_SEQUENCE) &&
+          type === ResponseType.SUCCESS_SEQUENCE ||
+          type === ResponseType.SERVER_INFO) &&
         r
       ) {
         return r;
